@@ -180,8 +180,10 @@
 <body class="min-h-screen py-8 px-4">
     <div class="container mx-auto max-w-4xl">
         <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-indigo-600 mb-2 floating">Mindful</h1>
-            <p class="text-gray-600 dark:text-gray-300">Your mental wellness companion</p>
+            <h1 class="text-4xl font-bold italic text-emerald-300 mb-2 animate-float">
+                Calmi🌿
+            </h1>
+            <p class="text-gray-600 dark:text-gray-300">- By InnerWhispers</p>            
         </header>
 
         <div class="mb-8">
@@ -226,7 +228,7 @@
                 </div>
             </div>
         </div>
-
+        <!-----------
         <div class="fixed bottom-4 right-4">
             <button onclick="toggleEmergencyInfo()" class="bg-[#fcf0f1] text-black px-4 py-2 rounded-full shadow-lg hover:bg-red-100 transition-colors">
               <strong>InnerWhispers</strong>
@@ -255,7 +257,7 @@
                     Close
                 </button>
             </div>
-        </div>
+        </div> ------------>
     </div>
 
     <script>
@@ -373,17 +375,26 @@
             if (!content) return;
 
             content.innerHTML = `
-                <div class="text-center">
-                    <h2 class="text-3xl font-bold mb-6">Welcome to Your Mental Wellness Check-in</h2>
-                    <p class="text-gray-600 dark:text-gray-300 mb-8">
-                        Take a moment to reflect on your mental well-being. 
-                        This assessment takes about 2-3 minutes to complete.
-                    </p>
-                    <button onclick="nextStep()" 
-                            class="bg-indigo-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-indigo-700 transition-all transform hover:scale-105">
-                        Begin Check-in
-                    </button>
-                </div>
+               <div class="text-center">
+                <!-- Cute Calmi Mascot or Logo -->
+                <img src="73b43820-c33d-46c7-a254-c78a4a7ba640-removebg-preview.png" alt="Calmi Mascot" class="mx-auto w-24 h-24 sm:w-32 sm:h-32 mb-4 drop-shadow-lg">
+
+               <h2 class="text-4xl font-extrabold font-serif text-emerald-300 dark:text-emerald-200 mb-4">
+                    Hey there! <br> I’m <span class="font-cursive italic">Calmi</span>,  
+                </h2>
+                <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                    Your gentle companion for checking in on your mind.
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-6">
+                    Take a moment to reflect on your mental well-being.  
+                    This quick check-in takes just <span class="font-semibold text-sky-300">2-3 minutes</span>.
+                </p>
+                <button onclick="nextStep()" 
+                    class="bg-indigo-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-indigo-700 transition-all transform hover:scale-105">
+                    Begin Check-in
+                </button>
+            </div>
+
             `;
             
             document.getElementById('poko-container').classList.add('hidden');
