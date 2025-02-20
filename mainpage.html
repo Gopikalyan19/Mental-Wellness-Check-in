@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful - Mental Health Checker</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f6f8ff 0%, #f1f5fe 100%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+        }
+
+        .slide-input {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 8px;
+            background: linear-gradient(to right, #4F46E5, #818CF8);
+            outline: none;
+            margin: 1rem 0;
+        }
+
+        .slide-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #4F46E5;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+        }
+
+        .emotion-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .emotion-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .emotion-card.selected {
+            border-color: #4F46E5;
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .sleep-slider {
+            background: linear-gradient(to right, #162447, #87CEEB, #FFEAA7);
+        }
+
+        .likert-scale {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        .likert-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .likert-radio {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #4F46E5;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .likert-radio:checked {
+            background-color: #4F46E5;
+        }
+
+        .likert-radio:checked::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .poko {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #9C92AC;
+            position: relative;
+            margin: 0 auto 20px;
+            transition: all 0.5s ease;
+        }
+
+        .poko-face {
+            position: absolute;
+            top: 30%;
+            width: 100%;
+            text-align: center;
+        }
+
+        .poko-calm .poko-face::after {
+            content: '◡‿◡';
+            font-size: 24px;
+        }
+
+        .poko-stressed .poko-face::after {
+            content: '⊙﹏⊙';
+            font-size: 24px;
+        }
+
+        .poko-overwhelmed .poko-face::after {
+            content: '≧ ﹏ ≦';
+            font-size: 24px;
+        }
+
+        .energy-option {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .energy-option:hover {
+            transform: translateY(-2px);
+        }
+
+        .energy-option.selected {
+            background: rgba(79, 70, 229, 0.1);
+            border: 2px solid #4F46E5;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a1c2c 0%, #242736 100%);
+                color: #fff;
+            }
+
+            .glass-card {
+                background: rgba(255, 255, 255, 0.1);
+                color: #fff;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8 px-4">
+    <div class="container mx-auto max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold italic text-emerald-300 mb-2 animate-float">
+                Calmi🌿
+            </h1>
+            <p class="text-gray-600 dark:text-gray-300">- By InnerWhispers</p>            
+        </header>
+
+        <div class="mb-8">
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-indigo-600 transition-all duration-300" id="progress-bar" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <span id="step-indicator">Step 1 of 8</span>
+                <span id="time-spent">Time: 0:00</span>
+            </div>
+        </div>
+
+        <div id="main-content" class="glass-card rounded-3xl p-8 mb-8">
+            <!-- Dynamic content will be loaded here -->
+        </div>
+
+        <div id="poko-container" class="hidden text-center mb-8">
+            <div id="poko" class="poko poko-calm">
+                <div class="poko-face"></div>
+            </div>
+            <p id="poko-message" class="text-center text-gray-600">Poko is here for you</p>
+        </div>
+
+        <div id="results-area" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="glass-card rounded-3xl p-6">
+                    <h3 class="text-xl font-semibold mb-4">Mood Tracking</h3>
+                    <canvas id="moodChart"></canvas>
+                </div>
+                
+                <div class="glass-card rounded-3xl p-6 text-center">
+                    <h3 class="text-xl font-semibold mb-4">Wellness Score</h3>
+                    <div class="relative w-48 h-48 mx-auto">
+                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                            <circle class="text-gray-200" stroke-width="10" stroke="currentColor" fill="none" r="40" cx="50" cy="50"/>
+                            <circle class="text-indigo-600 progress-ring-circle" stroke-width="10" stroke="currentColor" fill="none" r="40" cx="50" cy="50"/>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="text-4xl font-bold" id="score-display">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-----------
+        <div class="fixed bottom-4 right-4">
+            <button onclick="toggleEmergencyInfo()" class="bg-[#fcf0f1] text-black px-4 py-2 rounded-full shadow-lg hover:bg-red-100 transition-colors">
+              <strong>InnerWhispers</strong>
+            </button>
+        </div>
+
+        <div id="emergency-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+            <div class="bg-white rounded-2xl p-8 max-w-md mx-4">
+                <h3 class="text-2xl font-bold mb-4">Our Pages</h3>
+                <ul class="space-y-4 mb-6">
+                    <li>
+                        <strong>Our Website:</strong>
+                        <a href="https://innerwhispers.in/" class="text-indigo-600"> innerwhispers.in</a>
+                    </li>
+                    <li>
+                        <strong>Students Wellness Program:</strong>
+                        <a href="https://innerwhispers.in/student-willness.html" class="text-indigo-600">Visit </a>
+                    </li>
+                    <li>
+                        <strong>Students Wellness Program:</strong>
+                        <a href="https://innerwhispers.in/join-us-students.html" class="text-indigo-600">Join Us</a>
+                    </li>
+                    
+                </ul>
+                <button onclick="toggleEmergencyInfo()" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">
+                    Close
+                </button>
+            </div>
+        </div> ------------>
+    </div>
+
+    <script>
+        const state = {
+            currentStep: 1,
+            totalSteps: 8,
+            startTime: new Date(),
+            responses: {},
+            moodHistory: [],
+            timer: null,
+            mentalHealthQuiz: {
+                answers: [0, 0, 0, 0, 0]
+            },
+            stressLevel: null,
+            sleepQuality: 5,
+            energyLevel: null,
+            copingMechanisms: [],
+            supportLevel: 5
+        };
+
+        const questions = {
+            emotions: [
+                { emoji: "😊", label: "Happy", value: "happy" },
+                { emoji: "😔", label: "Sad", value: "sad" },
+                { emoji: "😠", label: "Angry", value: "angry" },
+                { emoji: "😰", label: "Anxious", value: "anxious" },
+                { emoji: "😐", label: "Neutral", value: "neutral" },
+                { emoji: "😴", label: "Tired", value: "tired" }
+            ],
+            activities: [
+                { emoji: "🏃‍♂️", label: "Exercise", value: "exercise" },
+                { emoji: "🎵", label: "Music", value: "music" },
+                { emoji: "📚", label: "Reading", value: "reading" },
+                { emoji: "🧘‍♀️", label: "Meditation", value: "meditation" },
+                { emoji: "🎨", label: "Art", value: "art" },
+                { emoji: "👥", label: "Socializing", value: "socializing" }
+            ],
+            mentalHealthQuiz: [
+                { icon: "🌪️", question: "How often do you feel overwhelmed?" },
+                { icon: "💤", question: "Do you have trouble sleeping?" },
+                { icon: "🧠", question: "Do you find it hard to focus?" },
+                { icon: "🎭", question: "How often do you experience mood swings?" },
+                { icon: "🤗", question: "Do you feel supported emotionally?" }
+            ],
+            stressLevels: [
+                { label: "Calm", value: "calm" },
+                { label: "Slightly Stressed", value: "slight" },
+                { label: "Very Stressed", value: "very" },
+                { label: "Overwhelmed", value: "overwhelmed" }
+            ],
+            energyLevels: [
+                { emoji: "⚡", label: "Energetic", value: "energetic" },
+                { emoji: "😊", label: "Normal", value: "normal" },
+                { emoji: "😴", label: "Tired", value: "tired" },
+                { emoji: "🔋", label: "Drained", value: "drained" }
+            ],
+            copingMechanisms: [
+                { emoji: "💬", label: "Talking", value: "talking" },
+                { emoji: "🎵", label: "Music", value: "music" },
+                { emoji: "📝", label: "Journaling", value: "journaling" },
+                { emoji: "🏃‍♂️", label: "Exercise", value: "exercise" },
+                { emoji: "😴", label: "Sleep", value: "sleep" },
+                { emoji: "❌", label: "None", value: "none" }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeApp();
+            startTimer();
+        });
+
+        function initializeApp() {
+            loadStep(1);
+            loadSavedData();
+            updateProgress();
+        }
+
+        function loadStep(step) {
+            const content = document.getElementById('main-content');
+            if (!content) return;
+            
+            content.innerHTML = '';
+            state.currentStep = step;
+
+            switch(step) {
+                case 1:
+                    renderWelcome();
+                    break;
+                case 2:
+                    renderMentalHealthQuiz();
+                    break;
+                case 3:
+                    renderStressAssessment();
+                    break;
+                case 4:
+                    renderSleepEnergyCheck();
+                    break;
+                case 5:
+                    renderCopingMechanisms();
+                    break;
+                case 6:
+                    renderEmotionCheck();
+                    break;
+                case 7:
+                    renderActivityCheck();
+                    break;
+                case 8:
+                    renderResults();
+                    break;
+            }
+        }
+
+        function renderWelcome() {
+            const content = document.getElementById('main-content');
+            if (!content) return;
+
+            content.innerHTML = `
+               <div class="text-center">
+                <!-- Cute Calmi Mascot or Logo -->
+                <img src="73b43820-c33d-46c7-a254-c78a4a7ba640-removebg-preview.png" alt="Calmi Mascot" class="mx-auto w-24 h-24 sm:w-32 sm:h-32 mb-4 drop-shadow-lg">
+
+               <h2 class="text-4xl font-extrabold font-serif text-emerald-300 dark:text-emerald-200 mb-4">
+                    Hey there! <br> I’m <span class="font-cursive italic">Calmi</span>,  
+                </h2>
+                <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                    Your gentle companion for checking in on your mind.
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-6">
+                    Take a moment to reflect on your mental well-being.  
+                    This quick check-in takes just <span class="font-semibold text-sky-300">2-3 minutes</span>.
+                </p>
+                <button onclick="nextStep()" 
+                    class="bg-indigo-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-indigo-700 transition-all transform hover:scale-105">
+                    Begin Check-in
+                </button>
+            </div>
+
+            `;
+            
+            document.getElementById('poko-container').classList.add('hidden');
+        }
+
+        function renderMentalHealthQuiz() {
+            const content = document.getElementById('main-content');
+            if (!content) return;
+
+            let quizHtml = `
+                <h2 class="text-2xl font-bold mb-6">Quick Mental Health Check</h2>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">Please rate how often you experience the following:</p>
+                <div class="space-y-6 max-w-2xl mx-auto">
+            `;
+
+            questions.mentalHealthQuiz.forEach((q, index) => {
+                quizHtml += `
+                    <div class="mb-4">
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-3">${q.icon}</span>
+                            <p class="font-medium">${q.question}</p>
+                        </div>
+                        <div class="likert-scale">
+                            ${[1, 2, 3, 4, 5].map(val => `
+                                <div class="likert-option">
+                                    <input type="radio" name="quiz-${index}" value="${val}" 
+                                           class="likert-radio" onclick="updateQuizAnswer(${index}, ${val})"
+                                           ${state.mentalHealthQuiz.answers[index] === val ? 'checked' : ''}>
+                                    <label class="text-xs text-gray-600">${getLikertLabel(val, index)}</label>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            quizHtml += `
+                <div class="mt-6 text-center">
+                    <button onclick="nextStep()" 
+                            class="bg-indigo-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg">
+                        Next
+                    </button>
+                </div>
+                </div>
+            `;
+
+            content.innerHTML = quizHtml;
+            document.getElementById('poko-container').classList.add('hidden');
+        }
+
+        function getLikertLabel(value, questionIndex) {
+            // Custom labels for question 5 (emotional support)
+            if (questionIndex === 4) {
+                const labels = ["Never", "Rarely", "Sometimes", "Often", "Always"];
+                return labels[value - 1];
+            }
+            // Default labels for other questions
+            else {
+                const labels = ["Never", "Rarely", "Sometimes", "Often", "Always"];
+                return labels[value - 1];
+            }
+        }
+
+        function updateQuizAnswer(questionIndex, value) {
+            state.mentalHealthQuiz.answers[questionIndex] = value;
+        }
+
+        function renderStressAssessment() {
+            const content = document.getElementById('main-content');
+            if (!content) return;
+
+            const pokoContainer = document.getElementById('poko-container');
+            if (pokoContainer) {
+                pokoContainer.classList.remove('hidden');
+            }
+
+            let stressHtml = `
+                <h2 class="text-2xl font-bold mb-6">Stress Level Assessment</h2>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">How does a busy workday make you feel?</p>
+                <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                    ${questions.stressLevels.map(level => `
+                        <div class="emotion-card p-4 rounded-xl bg-white shadow-sm text-center ${state.stressLevel === level.value ? 'selected' : ''}" 
+                             onclick="selectStressLevel('${level.value}', this)">
+                            <span class="font-medium">${level.label}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            content.innerHTML = stressHtml;
+            updatePokoMood(state.stressLevel);
+        }
+
+        function selectStressLevel(level, element) {
+            document.querySelectorAll('.emotion-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            state.stressLevel = level;
+            updatePokoMood(level);
+            setTimeout(nextStep, 800);
+        }
+
+        function updatePokoMood(stressLevel) {
+            const poko = document.getElementById('poko');
+            const pokoMessage = document.getElementById('poko-message');
+            
+            if (!poko || !pokoMessage) return;
+
+            poko.className = 'poko';
+            
+            switch(stressLevel) {
+                case 'calm':
+                    poko.classList.add('poko-calm');
+                    pokoMessage.textContent = "Poko is relaxed and calm";
+                    break;
+                case 'slight':
+                    poko.classList.add('poko-calm');
+                    pokoMessage.textContent = "Poko is a little concerned";
+                    break;
+                case 'very':
+                    poko.classList.add('poko-stressed');
+                    pokoMessage.textContent = "Poko is worried about you";
+                    break;
+                case 'overwhelmed':
+                    poko.classList.add('poko-overwhelmed');
+                    pokoMessage.textContent = "Poko wants to help you feel better";
+                    break;
+                default:
+                    poko.classList.add('poko-calm');
+                    pokoMessage.textContent = "Poko is here for you";
+            }
+        }
+
+        function renderSleepEnergyCheck() {
+            const content = document.getElementById('main-content');
+            if (!content) return;
+
+            const sleepValue = state.sleepQuality || 5;
+            const backgroundIntensity = Math.round((sleepValue / 10) * 100);
+            
+            let sleepEnergyHtml = `
+                <h2 class="text-2xl font-bold mb-6">Sleep & Energy Check</h2>
+                <div class="max-w-md mx-auto">
+                    <label class="block text-gray-700 font-medium mb-2">How well did you sleep last night?</label>
+                    <input type="range" min="0" max="10" value="${sleepValue}" class="slide-input sleep-slider" 
+                           onchange="updateSleepQuality(this.value); adjustBackground(this.value);">
+                    <div class="flex justify-between text-sm text-gray-600 mb-8">
+                        <span>Poor</span>
+                        <span>Excellent</span>
+                    </div>
+
+                    <label class="block text-gray-700 font-medium mb-4">How is your energy level today?</label>
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        ${questions.energyLevels.map(energy => `
+                            <div class="energy-option ${state.energyLevel === energy.value ? 'selected' : ''}" 
+                                 onclick="selectEnergyLevel('${energy.value}', this)">
+                                <span class="text-2xl block mb-1">${energy.emoji}</span>
+                                <span>${energy.label}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="mt-6 text-center">
+                        <button onclick="nextStep()" 
+                                class="bg-indigo-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-indigo-700">
+                            Continue
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            content.innerHTML = sleepEnergyHtml;
+            document.getElementById('poko-container').classList.add('hidden');
+            adjustBackground(sleepValue);
+        }
+
+        function updateSleepQuality(value) {
+            state.sleepQuality = parseInt(value);
+        }
+
+        function adjustBackground(sleepValue) {
+            const darkness = 100 - ((sleepValue / 10) * 40);
+            document.body.style.background = `linear-gradient(135deg, hsla(225, 25%, ${darkness}%, 1) 0%, hsla(225, 25%, ${darkness + 10}%, 1) 100%)`;
+        }
+
+        function selectEnergyLevel(level, element) {
+            document.querySelectorAll('.energy-option').forEach(option => option.classList.remove('selected'));
+            element.classList.add('selected');
+            state.energyLevel = level;
+        }
+
+        function renderCopingMechanisms() {
+            const content = document.getElementById('main-content');
+            if (!content) return;
+
+            const pokoContainer = document.getElementById('poko-container');
+            if (pokoContainer) {
+                pokoContainer.classList.remove('hidden');
+            }
+
+            let copingHtml = `
+                <h2 class="text-2xl font-bold mb-6">Coping Mechanisms & Support</h2>
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-medium mb-4">What helps you cope when you're feeling down? (Select all that apply)</label>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        ${questions.copingMechanisms.map(coping => `
+                            <div class="emotion-card p-4 rounded-xl bg-white shadow-sm text-center ${state.copingMechanisms.includes(coping.value) ? 'selected' : ''}" 
+                                 onclick="toggleCopingMechanism('${coping.value}', this)">
+                                <span class="text-2xl mb-2 block">${coping.emoji}</span>
+                                <span class="font-medium">${coping.label}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="mt-8 max-w-md mx-auto">
+                    <label class="block text-gray-700 font-medium mb-2">How supported do you feel today?</label>
+                    <input type="range" min="1" max="10" value="${state.supportLevel}" class="slide-input" 
+                           onchange="updateSupportLevel(this.value)">
+                    <div class="flex justify-between text-sm text-gray-600">
+                        <span>Not at all</span>
+                        <span>Very supported</span>
+                    </div>
+                    <div class="mt-6 text-center">
+                        <button onclick="nextStep()" 
+                                class="bg-indigo-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-indigo-700">
+                            Continue
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            content.innerHTML = copingHtml;
+            updatePokoForCoping();
+        }
+
+        function toggleCopingMechanism(mechanism, element) {
+            element.classList.toggle('selected');
+            if (element.classList.contains('selected')) {
+                if (!state.copingMechanisms.includes(mechanism)) {
+                    // If selecting "None", clear all other selections
+                    if (mechanism === 'none') {
+                        state.copingMechanisms = ['none'];
+                        document.querySelectorAll('.emotion-card').forEach(card => {
+                            if (!card.textContent.includes('None')) {
+                                card.classList.remove('selected');
+                            }
+                        });
+                    } else {
+                        // If selecting any other option, remove "None" if it's selected
+                        if (state.copingMechanisms.includes('none')) {
+                            state.copingMechanisms = state.copingMechanisms.filter(m => m !== 'none');
+                            document.querySelectorAll('.emotion-card').forEach(card => {
+                                if (card.textContent.includes('None')) {
+                                    card.classList.remove('selected');
+                                }
+                            });
+                        }
+                        state.copingMechanisms.push(mechanism);
+                    }
+                }
+            } else {
+                state.copingMechanisms = state.copingMechanisms.filter(m => m !== mechanism);
+            }
+            updatePokoForCoping();
+        }
+
+        function updatePokoForCoping() {
+            const poko = document.getElementById('poko');
+            const pokoMessage = document.getElementById('poko-message');
+            
+            if (!poko || !pokoMessage) return;
+
+            if (state.copingMechanisms.includes('talking')) {
+                poko.className = 'poko poko-calm';
+                pokoMessage.textContent = "Talking helps! Poko is a good listener";
+            } else if (state.copingMechanisms.includes('none')) {
+                poko.className = 'poko poko-stressed';
+                pokoMessage.textContent = "Poko offers a virtual hug";
+            } else if (state.copingMechanisms.length > 0) {
+                poko.className = 'poko poko-calm';
+                pokoMessage.textContent = "Poko is happy you have coping strategies";
+            } else {
+                poko.className = 'poko poko-calm';
+                pokoMessage.textContent = "Poko is here for you";
+            }
+        }
+
+        function updateSupportLevel(value) {
+            state.supportLevel = parseInt(value);
+        }
+
+        function renderEmotionCheck() {
+            const content = document.getElementById('main-content');
+            if (!content) return;
+
+            content.innerHTML = `
+                <h2 class="text-2xl font-bold mb-6">How are you feeling today?</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    ${questions.emotions.map(emotion => `
+                        <div class="emotion-card p-4 rounded-xl bg-white shadow-sm text-center" 
+                             onclick="selectEmotion('${emotion.value}', this)">
+                            <span class="text-4xl mb-2 block">${emotion.emoji}</span>
+                            <span class="font-medium">${emotion.label}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            document.getElementById('poko-container').classList.add('hidden');
+        }
+
+        function renderActivityCheck() {
+            const content = document.getElementById('main-content');
+            if (!content) return;
+
+            state.responses.activities = state.responses.activities || [];
+            content.innerHTML = `
+                <h2 class="text-2xl font-bold mb-6">What activities help you feel better?</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    ${questions.activities.map(activity => `
+                        <div class="emotion-card p-4 rounded-xl bg-white shadow-sm text-center" 
+                             onclick="selectActivity('${activity.value}', this)">
+                            <span class="text-4xl mb-2 block">${activity.emoji}</span>
+                            <span class="font-medium">${activity.label}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="mt-6 text-center">
+                    <button onclick="nextStep()" 
+                            class="bg-indigo-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-indigo-700">
+                        Continue
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('poko-container').classList.add('hidden');
+        }
+
+        function renderResults() {
+    const content = document.getElementById('main-content');
+    if (!content) return;
+
+    // Calculate wellness score
+    const score = calculateWellnessScore();
+    
+    // Save current check-in data
+    saveMoodData();
+
+    content.innerHTML = `
+        <h2 class="text-3xl font-bold mb-6 text-center">Your Wellness Report</h2>
+        <div class="mb-8">
+            <p class="text-gray-600 dark:text-gray-300 text-center mb-4">
+                Based on your responses, here's your mental wellness summary:
+            </p>
+            
+            <div class="glass-card rounded-xl p-6 mb-6">
+                <h3 class="text-xl font-semibold mb-4">Your Insights</h3>
+                <ul class="space-y-3">
+                    ${generateInsights()}
+                </ul>
+            </div>
+            
+            <div class="glass-card rounded-xl p-6 mb-6">
+                <h3 class="text-xl font-semibold mb-4">Recommendations</h3>
+                <ul class="space-y-3">
+                    ${generateRecommendations()}
+                </ul>
+            </div>
+        </div>
+        
+        <div class="text-center">
+            <button onclick="saveAndReset()" 
+                    class="bg-indigo-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-indigo-700 transition-all shadow-lg">
+                Complete Check-in
+            </button>
+        </div>
+    `;
+    
+    document.getElementById('results-area').classList.remove('hidden');
+    updateScoreDisplay(score);
+    renderMoodChart();
+}
+
+function selectEmotion(emotion, element) {
+    document.querySelectorAll('.emotion-card').forEach(card => card.classList.remove('selected'));
+    element.classList.add('selected');
+    state.responses.emotion = emotion;
+    setTimeout(nextStep, 800);
+}
+
+function selectActivity(activity, element) {
+    element.classList.toggle('selected');
+    if (element.classList.contains('selected')) {
+        if (!state.responses.activities) {
+            state.responses.activities = [];
+        }
+        if (!state.responses.activities.includes(activity)) {
+            state.responses.activities.push(activity);
+        }
+    } else {
+        state.responses.activities = state.responses.activities.filter(a => a !== activity);
+    }
+}
+
+function nextStep() {
+    if (state.currentStep < state.totalSteps) {
+        loadStep(state.currentStep + 1);
+        updateProgress();
+    }
+}
+
+function updateProgress() {
+    const progressBar = document.getElementById('progress-bar');
+    const stepIndicator = document.getElementById('step-indicator');
+    
+    if (progressBar && stepIndicator) {
+        const percentage = ((state.currentStep - 1) / (state.totalSteps - 1)) * 100;
+        progressBar.style.width = `${percentage}%`;
+        stepIndicator.textContent = `Step ${state.currentStep} of ${state.totalSteps}`;
+    }
+}
+
+function calculateWellnessScore() {
+    let score = 0;
+    let totalPoints = 0;
+    
+    // Mental health quiz (20 points max)
+    const quizScore = state.mentalHealthQuiz.answers.reduce((sum, val) => sum + val, 0);
+    score += quizScore / 25 * 20;
+    totalPoints += 20;
+    
+    // Stress level (15 points max)
+    const stressScores = { calm: 15, slight: 10, very: 5, overwhelmed: 0 };
+    if (state.stressLevel) {
+        score += stressScores[state.stressLevel] || 0;
+    }
+    totalPoints += 15;
+    
+    // Sleep quality (15 points max)
+    score += (state.sleepQuality / 10) * 15;
+    totalPoints += 15;
+    
+    // Energy level (10 points max)
+    const energyScores = { energetic: 10, normal: 8, tired: 5, drained: 2 };
+    if (state.energyLevel) {
+        score += energyScores[state.energyLevel] || 0;
+    }
+    totalPoints += 10;
+    
+    // Coping mechanisms (15 points max)
+    if (state.copingMechanisms && state.copingMechanisms.length > 0) {
+        if (state.copingMechanisms.includes('none')) {
+            score += 3;
+        } else {
+            score += Math.min(state.copingMechanisms.length * 3, 15);
+        }
+    }
+    totalPoints += 15;
+    
+    // Support level (15 points max)
+    score += (state.supportLevel / 10) * 15;
+    totalPoints += 15;
+    
+    // Emotional state (10 points max)
+    const emotionScores = { happy: 10, neutral: 7, tired: 6, anxious: 4, angry: 3, sad: 2 };
+    if (state.responses.emotion) {
+        score += emotionScores[state.responses.emotion] || 0;
+    }
+    totalPoints += 10;
+    
+    return Math.round((score / totalPoints) * 100);
+}
+
+function updateScoreDisplay(score) {
+    const scoreDisplay = document.getElementById('score-display');
+    const circle = document.querySelector('.progress-ring-circle');
+    
+    if (scoreDisplay) {
+        scoreDisplay.textContent = `${score}%`;
+    }
+    
+    if (circle) {
+        const radius = circle.getAttribute('r');
+        const circumference = 2 * Math.PI * radius;
+        circle.style.strokeDasharray = circumference;
+        circle.style.strokeDashoffset = circumference - (score / 100) * circumference;
+    }
+}
+
+function generateInsights() {
+    let insights = [];
+    
+    // Sleep insight
+    if (state.sleepQuality <= 3) {
+        insights.push("<li>Your sleep quality is low, which can significantly affect your mood and energy levels.</li>");
+    } else if (state.sleepQuality >= 8) {
+        insights.push("<li>Great job maintaining healthy sleep habits!</li>");
+    }
+    
+    // Stress and coping insight
+    if (state.stressLevel === 'very' || state.stressLevel === 'overwhelmed') {
+        if (state.copingMechanisms && state.copingMechanisms.length <= 1) {
+            insights.push("<li>Your stress level is high, and you have limited coping strategies.</li>");
+        } else {
+            insights.push("<li>While your stress level is high, you have multiple coping strategies which is excellent.</li>");
+        }
+    }
+    
+    // Support network insight
+    if (state.supportLevel <= 3) {
+        insights.push("<li>You may benefit from building a stronger support network.</li>");
+    } else if (state.supportLevel >= 8) {
+        insights.push("<li>Having strong support is a significant protective factor for mental health.</li>");
+    }
+    
+    // Mental health quiz insight
+    const avgQuizScore = state.mentalHealthQuiz.answers.reduce((sum, val) => sum + val, 0) / 5;
+    if (avgQuizScore >= 4) {
+        insights.push("<li>Your responses indicate some potential mental health challenges.</li>");
+    }
+    
+    // Add generic insight if list is empty
+    if (insights.length === 0) {
+        insights.push("<li>Your responses indicate a generally balanced mental state.</li>");
+        insights.push("<li>Continue monitoring your emotions and stress levels regularly.</li>");
+    }
+    
+    return insights.join("");
+}
+
+function generateRecommendations() {
+    let recommendations = [];
+    
+    // Sleep recommendations
+    if (state.sleepQuality <= 5) {
+        recommendations.push("<li>Consider establishing a regular sleep routine and limiting screen time before bed.</li>");
+    }
+    
+    // Stress recommendations
+    if (state.stressLevel === 'very' || state.stressLevel === 'overwhelmed') {
+        recommendations.push("<li>Practice daily mindfulness exercises to reduce stress levels.</li>");
+        recommendations.push("<li>Consider breaking large tasks into smaller, manageable steps.</li>");
+    }
+    
+    // Coping mechanism recommendations
+    if (!state.copingMechanisms || state.copingMechanisms.length <= 1 || state.copingMechanisms.includes('none')) {
+        recommendations.push("<li>Try exploring different stress management techniques like deep breathing, meditation, or gentle exercise.</li>");
+    }
+    
+    // Support recommendations
+    if (state.supportLevel <= 5) {
+        recommendations.push("<li>Consider reaching out to friends, family, or a professional counselor for additional support.</li>");
+    }
+    
+    // Activity recommendations based on mood
+    if (state.responses.emotion === 'sad' || state.responses.emotion === 'anxious') {
+        recommendations.push("<li>Engaging in light physical activity can help improve your mood.</li>");
+    }
+    
+    // Add generic recommendations if list is empty
+    if (recommendations.length === 0) {
+        recommendations.push("<li>Continue practicing your current wellness routines.</li>");
+        recommendations.push("<li>Consider keeping a mood journal to track patterns over time.</li>");
+    }
+    
+    return recommendations.join("");
+}
+
+function renderMoodChart() {
+    const ctx = document.getElementById('moodChart');
+    if (!ctx) return;
+    
+    // Ensure we have data to display
+    if (!state.moodHistory || state.moodHistory.length === 0) {
+        return;
+    }
+    
+    // Get last 7 days of mood data (or all if less than 7)
+    const chartData = state.moodHistory.slice(-7);
+    
+    // Create labels (dates) and data points
+    const labels = chartData.map(entry => formatDate(entry.date));
+    const data = chartData.map(entry => entry.score);
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Wellness Score',
+                data: data,
+                borderColor: '#4F46E5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                tension: 0.3,
+                fill: true,
+                pointBackgroundColor: '#4F46E5',
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        stepSize: 20
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    titleColor: '#1F2937',
+                    bodyColor: '#4B5563',
+                    borderColor: '#E5E7EB',
+                    borderWidth: 1,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return `Score: ${context.parsed.y}%`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function saveMoodData() {
+    const score = calculateWellnessScore();
+    const today = new Date().toISOString().split('T')[0];
+    
+    const entry = {
+        date: today,
+        score: score,
+        emotion: state.responses.emotion,
+        stress: state.stressLevel,
+        sleep: state.sleepQuality
+    };
+    
+    state.moodHistory.push(entry);
+    
+    // Save to localStorage
+    localStorage.setItem('mindfulMoodHistory', JSON.stringify(state.moodHistory));
+}
+
+function loadSavedData() {
+    const savedMoodHistory = localStorage.getItem('mindfulMoodHistory');
+    if (savedMoodHistory) {
+        state.moodHistory = JSON.parse(savedMoodHistory);
+    } else {
+        state.moodHistory = [];
+    }
+}
+
+function saveAndReset() {
+    // Ensure data is saved
+    saveMoodData();
+    
+    // Show completion message
+    const content = document.getElementById('main-content');
+    if (content) {
+        content.innerHTML = `
+            <div class="text-center">
+                <h2 class="text-3xl font-bold mb-6">Check-in Complete</h2>
+                <div class="mb-8">
+                    <svg class="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        Thank you for completing your mental health check-in today.
+                        Remember to check in regularly to track your well-being.
+                    </p>
+                </div>
+                <button onclick="resetApp()" 
+                        class="bg-indigo-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-indigo-700">
+                    Start New Check-in
+                </button>
+            </div>
+        `;
+    }
+    
+    // Hide results area
+    document.getElementById('results-area').classList.add('hidden');
+}
+
+function resetApp() {
+    // Reset state
+    state.currentStep = 1;
+    state.responses = {};
+    state.mentalHealthQuiz.answers = [0, 0, 0, 0, 0];
+    state.stressLevel = null;
+    state.sleepQuality = 5;
+    state.energyLevel = null;
+    state.copingMechanisms = [];
+    state.supportLevel = 5;
+    
+    // Start over
+    loadStep(1);
+    updateProgress();
+}
+
+function startTimer() {
+    state.startTime = new Date();
+    state.timer = setInterval(updateTimer, 1000);
+}
+
+function updateTimer() {
+    const timeSpentElement = document.getElementById('time-spent');
+    if (!timeSpentElement) return;
+    
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - state.startTime) / 1000);
+    const minutes = Math.floor(diffInSeconds / 60);
+    const seconds = diffInSeconds % 60;
+    
+    timeSpentElement.textContent = `Time: ${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+}
+
+function toggleEmergencyInfo() {
+    const modal = document.getElementById('emergency-modal');
+    if (modal) {
+        modal.classList.toggle('hidden');
+    }
+}
+
+</script>
+</body>
+</html>

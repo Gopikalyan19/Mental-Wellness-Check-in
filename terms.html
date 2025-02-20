@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calmi - Terms & Conditions</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-[#FAF9F6] text-[#333333] min-h-screen">
+  <div class="max-w-4xl mx-auto px-4 py-8 md:px-8">
+    <!-- Header Section -->
+    <header class="mb-10 flex flex-col md:flex-row items-center justify-between">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-semibold text-[#6AB4A4] mb-2">Terms & Conditions</h1>
+        <p class="text-sm text-gray-500">Last Updated: February 20, 2025</p>
+      </div>
+      <div class="mt-4 md:mt-0">
+        <img src="73b43820-c33d-46c7-a254-c78a4a7ba640-removebg-preview.png" alt="Calmi mascot with scroll" class="h-24 w-auto"/>
+      </div>
+    </header>
+
+    <!-- Introduction -->
+    <div class="mb-8 bg-white rounded-xl p-6 shadow-sm">
+      <h2 class="text-xl font-medium text-[#6AB4A4] mb-4">1. Introduction</h2>
+      <p class="mb-4">Welcome to <span class="font-semibold">Calmi 🌿</span>, a mental wellness check-in platform by InnerWhispers. By accessing and using Calmi, you agree to the following Terms and Conditions.</p>
+    </div>
+
+    <!-- Accordion Sections -->
+    <div class="space-y-4">
+      <!-- User Eligibility -->
+      <div class="bg-white rounded-xl overflow-hidden shadow-sm">
+        <button class="flex items-center justify-between w-full p-6 text-left focus:outline-none focus:ring-2 focus:ring-[#A7D7C5] focus:ring-opacity-50" onclick="toggleAccordion('eligibility')">
+          <div class="flex items-center">
+            <span class="bg-[#A7D7C5] bg-opacity-20 p-2 rounded-full mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </span>
+            <h2 class="text-xl font-medium">2. User Eligibility</h2>
+          </div>
+          <svg id="eligibility-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4] transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="eligibility-content" class="hidden px-6 pb-6">
+          <ul class="list-disc ml-12 space-y-2">
+            <li>You must be at least <strong>16 years old</strong> to use Calmi.</li>
+            <li>If under 16, parental or guardian consent is required.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Purpose of Calmi -->
+      <div class="bg-white rounded-xl overflow-hidden shadow-sm">
+        <button class="flex items-center justify-between w-full p-6 text-left focus:outline-none focus:ring-2 focus:ring-[#A7D7C5] focus:ring-opacity-50" onclick="toggleAccordion('purpose')">
+          <div class="flex items-center">
+            <span class="bg-[#A7D7C5] bg-opacity-20 p-2 rounded-full mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </span>
+            <h2 class="text-xl font-medium">3. Purpose of Calmi</h2>
+          </div>
+          <svg id="purpose-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4] transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="purpose-content" class="hidden px-6 pb-6">
+          <ul class="list-disc ml-12 space-y-2">
+            <li>Calmi is a <strong>self-assessment tool</strong> for mental well-being.</li>
+            <li>It <strong>does not replace</strong> professional medical advice, diagnosis, or treatment.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- User Responsibilities -->
+      <div class="bg-white rounded-xl overflow-hidden shadow-sm">
+        <button class="flex items-center justify-between w-full p-6 text-left focus:outline-none focus:ring-2 focus:ring-[#A7D7C5] focus:ring-opacity-50" onclick="toggleAccordion('responsibilities')">
+          <div class="flex items-center">
+            <span class="bg-[#A7D7C5] bg-opacity-20 p-2 rounded-full mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </span>
+            <h2 class="text-xl font-medium">4. User Responsibilities</h2>
+          </div>
+          <svg id="responsibilities-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4] transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="responsibilities-content" class="hidden px-6 pb-6">
+          <ul class="list-disc ml-12 space-y-2">
+            <li>You agree to provide <strong>accurate and truthful information</strong>.</li>
+            <li>You will not misuse the platform (e.g., unauthorized access, spam, or harmful behavior).</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Data Collection & Privacy -->
+      <div class="bg-white rounded-xl overflow-hidden shadow-sm">
+        <button class="flex items-center justify-between w-full p-6 text-left focus:outline-none focus:ring-2 focus:ring-[#A7D7C5] focus:ring-opacity-50" onclick="toggleAccordion('data')">
+          <div class="flex items-center">
+            <span class="bg-[#A7D7C5] bg-opacity-20 p-2 rounded-full mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </span>
+            <h2 class="text-xl font-medium">5. Data Collection & Privacy</h2>
+          </div>
+          <svg id="data-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4] transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="data-content" class="hidden px-6 pb-6">
+          <ul class="list-disc ml-12 space-y-2">
+            <li>Your data is handled per our <strong>Privacy Policy</strong> (see below).</li>
+            <li>We do <strong>not</strong> share personal data without consent.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Account & Security -->
+      <div class="bg-white rounded-xl overflow-hidden shadow-sm">
+        <button class="flex items-center justify-between w-full p-6 text-left focus:outline-none focus:ring-2 focus:ring-[#A7D7C5] focus:ring-opacity-50" onclick="toggleAccordion('security')">
+          <div class="flex items-center">
+            <span class="bg-[#A7D7C5] bg-opacity-20 p-2 rounded-full mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </span>
+            <h2 class="text-xl font-medium">6. Account & Security</h2>
+          </div>
+          <svg id="security-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4] transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="security-content" class="hidden px-6 pb-6">
+          <ul class="list-disc ml-12 space-y-2">
+            <li>You are responsible for maintaining your account security.</li>
+            <li>If you suspect unauthorized access, contact <strong>help.innerwhispers@gmail.com</strong> immediately.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Limitation of Liability -->
+      <div class="bg-white rounded-xl overflow-hidden shadow-sm">
+        <button class="flex items-center justify-between w-full p-6 text-left focus:outline-none focus:ring-2 focus:ring-[#A7D7C5] focus:ring-opacity-50" onclick="toggleAccordion('liability')">
+          <div class="flex items-center">
+            <span class="bg-[#A7D7C5] bg-opacity-20 p-2 rounded-full mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </span>
+            <h2 class="text-xl font-medium">7. Limitation of Liability</h2>
+          </div>
+          <svg id="liability-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4] transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="liability-content" class="hidden px-6 pb-6">
+          <ul class="list-disc ml-12 space-y-2">
+            <li>Calmi is provided <strong>"as is"</strong> without warranties.</li>
+            <li>We are <strong>not liable</strong> for any decisions made based on Calmi's assessments.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Termination of Service -->
+      <div class="bg-white rounded-xl overflow-hidden shadow-sm">
+        <button class="flex items-center justify-between w-full p-6 text-left focus:outline-none focus:ring-2 focus:ring-[#A7D7C5] focus:ring-opacity-50" onclick="toggleAccordion('termination')">
+          <div class="flex items-center">
+            <span class="bg-[#A7D7C5] bg-opacity-20 p-2 rounded-full mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </span>
+            <h2 class="text-xl font-medium">8. Termination of Service</h2>
+          </div>
+          <svg id="termination-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4] transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="termination-content" class="hidden px-6 pb-6">
+          <p class="ml-4">We reserve the right to suspend or terminate accounts violating these Terms.</p>
+        </div>
+      </div>
+
+      <!-- Changes to Terms -->
+      <div class="bg-white rounded-xl overflow-hidden shadow-sm">
+        <button class="flex items-center justify-between w-full p-6 text-left focus:outline-none focus:ring-2 focus:ring-[#A7D7C5] focus:ring-opacity-50" onclick="toggleAccordion('changes')">
+          <div class="flex items-center">
+            <span class="bg-[#A7D7C5] bg-opacity-20 p-2 rounded-full mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </span>
+            <h2 class="text-xl font-medium">9. Changes to Terms</h2>
+          </div>
+          <svg id="changes-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#6AB4A4] transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="changes-content" class="hidden px-6 pb-6">
+          <p class="ml-4">We may update these Terms occasionally. Continued use means you accept the changes.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer / CTA -->
+    <div class="sticky bottom-0 mt-10 p-4 bg-gradient-to-r from-[#F8F9FA] to-[#E8F4F0] rounded-t-xl shadow-md">
+      <div class="flex flex-col sm:flex-row items-center justify-between max-w-4xl mx-auto">
+        <div class="text-sm text-gray-500 mb-4 sm:mb-0">
+          <p>© 2024 InnerWhispers. All rights reserved.</p>
+        </div>
+        <div class="flex items-center space-x-4">
+         <a href="index.html" class="bg-[#6AB4A4] hover:bg-[#5AA494] text-white py-3 px-6 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#6AB4A4] focus:ring-opacity-50">Accept & Continue</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleAccordion(id) {
+      const content = document.getElementById(`${id}-content`);
+      const icon = document.getElementById(`${id}-icon`);
+      
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+      } else {
+        content.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+  </script>
+</body>
+</html>
