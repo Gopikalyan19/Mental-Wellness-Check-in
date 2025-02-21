@@ -66,6 +66,15 @@
                 </svg>
             </button>
 
+            <!-- Already Signed In Button -->
+            <div class="flex justify-center mt-4">
+                <button type="button" id="alreadySignedInBtn" 
+                    class="text-emerald-600 hover:text-emerald-700 font-medium text-sm 
+                        focus:outline-none focus:underline transition-all">
+                    Already signed in? Continue to app
+                </button>
+            </div>
+
             <!-- Privacy Note -->
             <p class="text-center text-xs text-gray-500 mt-4">
                 By continuing, you agree to our <a href="terms.html" class="text-emerald-500 hover:text-emerald-600">Terms of Service</a> and <a href="privacy.html" class="text-emerald-500 hover:text-emerald-600">Privacy Policy</a>.
@@ -75,164 +84,262 @@
 
     <script>
         // Your web app's Firebase configuration
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-        const firebaseConfig = {
-            apiKey: "AIzaSyCM4L6ZPKbc8GxxlTuEBFpAlnnPmH0lPfs",
-            authDomain: "calmi-97799.firebaseapp.com",
-            databaseURL: "https://calmi-97799-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "calmi-97799",
-            storageBucket: "calmi-97799.firebasestorage.app",
-            messagingSenderId: "115592321155",
-            appId: "1:115592321155:web:6a8328874ac03a6d1da3b6",
-            measurementId: "G-8BJMBZT3F3"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        
-        // Get a reference to the database service
-        const database = firebase.database();
+const firebaseConfig = {
+    apiKey: "AIzaSyCM4L6ZPKbc8GxxlTuEBFpAlnnPmH0lPfs",
+    authDomain: "calmi-97799.firebaseapp.com",
+    databaseURL: "https://calmi-97799-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "calmi-97799",
+    storageBucket: "calmi-97799.firebasestorage.app",
+    messagingSenderId: "115592321155",
+    appId: "1:115592321155:web:6a8328874ac03a6d1da3b6",
+    measurementId: "G-8BJMBZT3F3"
+};
 
-        // DOM Elements
-        const userForm = document.getElementById('userForm');
-        const nameInput = document.getElementById('name');
-        const emailInput = document.getElementById('email');
-        const errorMessage = document.getElementById('errorMessage');
-        const buttonText = document.getElementById('buttonText');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const poko = document.getElementById('poko');
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
-        // Auto-focus name field
-        nameInput.focus();
+// Get a reference to the database service
+const database = firebase.database();
 
-        // Handle form submission
-        userForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+// DOM Elements
+const userForm = document.getElementById('userForm');
+const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('email');
+const errorMessage = document.getElementById('errorMessage');
+const buttonText = document.getElementById('buttonText');
+const loadingSpinner = document.getElementById('loadingSpinner');
+const poko = document.getElementById('poko');
+const alreadySignedInBtn = document.getElementById('alreadySignedInBtn');
+
+// Check if user is already signed in
+checkExistingUser();
+
+// Auto-focus name field
+nameInput.focus();
+
+// Handle "Already Signed In" button click
+alreadySignedInBtn.addEventListener('click', () => {
+    const existingUserData = localStorage.getItem('calmi_user_data');
+    
+    if (existingUserData) {
+        try {
+            const userData = JSON.parse(existingUserData);
             
-            // Basic validation
-            if (!nameInput.value.trim()) {
-                showError('Please enter your name');
-                return;
-            }
-            
-            if (!emailInput.value.trim() || !isValidEmail(emailInput.value)) {
-                showError('Please enter a valid email address');
-                return;
-            }
-            
+            // Show loading state
             setLoading(true);
-            hideError();
-
-            // Prepare user data
-            const userData = {
-                name: nameInput.value.trim(),
-                email: emailInput.value.trim(),
-                timestamp: new Date().toISOString()
-            };
+            alreadySignedInBtn.disabled = true;
             
-            // Store in localStorage for local use
-            localStorage.setItem('calmi_user_data', JSON.stringify(userData));
-            
-            // Store in Firebase Realtime Database
-            saveToFirebase(userData);
-        });
-
-        // Save user data to Firebase
-        function saveToFirebase(userData) {
-            // Create a unique key for the user entry
+            // Check if user exists in Firebase
             const userId = generateUserId(userData.email);
-            
-            // Write to Firebase
-            database.ref('users/' + userId).set(userData)
-                .then(() => {
-                    showSuccess();
+            database.ref('users/' + userId).once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        // User exists in Firebase
+                        logSignInViaButton(userId, userData);
+                        showSuccess();
+                    } else {
+                        // User exists in localStorage but not in Firebase
+                        // Re-save user to Firebase
+                        saveToFirebase(userData);
+                    }
                 })
                 .catch((error) => {
-                    console.error("Firebase error:", error);
-                    showError("Couldn't save your data. Please try again.");
-                    setLoading(false);
+                    console.error("Firebase verification error:", error);
+                    // Still allow access if we can't verify with Firebase
+                    // (offline fallback)
+                    showSuccess();
                 });
+        } catch (e) {
+            console.error("Error parsing stored user data:", e);
+            showError('Error with saved login data. Please sign in again.');
+            localStorage.removeItem('calmi_user_data');
         }
+    } else {
+        // No stored user data
+        showError('No previous sign-in found. Please enter your details.');
+    }
+});
 
-        // Generate a consistent ID from email
-        function generateUserId(email) {
-            // Simple hash function for demo purposes
-            // In production, use more secure methods
-            let hash = 0;
-            for (let i = 0; i < email.length; i++) {
-                hash = ((hash << 5) - hash) + email.charCodeAt(i);
-                hash |= 0; // Convert to 32bit integer
-            }
-            return 'user_' + Math.abs(hash).toString(16);
-        }
+// Track when users use the "Already Signed In" button
+function logSignInViaButton(userId, userData) {
+    const loginLog = {
+        method: "already_signed_in_button",
+        timestamp: new Date().toISOString(),
+        device: navigator.userAgent,
+        userName: userData.name || "Unknown" // Add the user's name to the log
+    };
+    
+    // Add to a "login_logs" collection
+    database.ref('login_logs/' + userId + '/' + Date.now()).set(loginLog);
+    
+    // Also update the user's last login time
+    database.ref('users/' + userId + '/lastLogin').set(new Date().toISOString());
+}
 
-        // Helper functions
-        function isValidEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
+// Handle form submission
+userForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    // Basic validation
+    if (!nameInput.value.trim()) {
+        showError('Please enter your name');
+        return;
+    }
+    
+    if (!emailInput.value.trim() || !isValidEmail(emailInput.value)) {
+        showError('Please enter a valid email address');
+        return;
+    }
+    
+    setLoading(true);
+    hideError();
 
-        function setLoading(isLoading) {
-            buttonText.textContent = isLoading ? 'Processing...' : 'Continue';
-            loadingSpinner.classList.toggle('hidden', !isLoading);
-            userForm.classList.toggle('opacity-70', isLoading);
-        }
+    // Prepare user data
+    const userData = {
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        timestamp: new Date().toISOString()
+    };
+    
+    // Store in localStorage for local use
+    localStorage.setItem('calmi_user_data', JSON.stringify(userData));
+    
+    // Store in Firebase Realtime Database
+    saveToFirebase(userData);
+});
 
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.classList.remove('hidden');
-            userForm.classList.add('shake');
-            setTimeout(() => userForm.classList.remove('shake'), 500);
-        }
-
-        function hideError() {
-            errorMessage.classList.add('hidden');
-        }
-
-        function showSuccess() {
-            // Animate Poko
-            poko.classList.add('jump');
+// Check if user has previously signed in
+function checkExistingUser() {
+    const existingUserData = localStorage.getItem('calmi_user_data');
+    
+    if (existingUserData) {
+        try {
+            const userData = JSON.parse(existingUserData);
             
-            // Navigate to the next page
+            // Auto-fill the form fields
+            if (userData.name) nameInput.value = userData.name;
+            if (userData.email) emailInput.value = userData.email;
+            
+            // Make the "Already Signed In" button more prominent
+            alreadySignedInBtn.classList.add('text-lg', 'font-bold');
             setTimeout(() => {
-                window.location.href = '/mainpage.html';
-            }, 600);
+                alreadySignedInBtn.classList.remove('text-lg', 'font-bold');
+            }, 2000);
+        } catch (e) {
+            console.error("Error parsing stored user data:", e);
+            localStorage.removeItem('calmi_user_data');
         }
+    }
+}
 
-        // Add these styles to your CSS
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes wave {
-                0%, 100% { transform: rotate(0deg); }
-                25% { transform: rotate(-15deg); }
-                75% { transform: rotate(15deg); }
-            }
-            
-            @keyframes jump {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-20px); }
-            }
-            
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                25% { transform: translateX(-5px); }
-                75% { transform: translateX(5px); }
-            }
-            
-            .animate-wave {
-                animation: wave 2s infinite;
-                transform-origin: bottom center;
-            }
-            
-            .jump {
-                animation: jump 0.5s ease-in-out;
-            }
-            
-            .shake {
-                animation: shake 0.3s ease-in-out;
-            }
-        `;
-        document.head.appendChild(style);
+// Save user data to Firebase
+function saveToFirebase(userData) {
+    // Create a unique key for the user entry
+    const userId = generateUserId(userData.email);
+    
+    // Write to Firebase
+    database.ref('users/' + userId).set({
+        ...userData,
+        lastLogin: new Date().toISOString()
+    })
+    .then(() => {
+        // Also log this as a regular login
+        const loginLog = {
+            method: "form_submission",
+            timestamp: new Date().toISOString(),
+            device: navigator.userAgent,
+            userName: userData.name || "Unknown"
+        };
+        database.ref('login_logs/' + userId + '/' + Date.now()).set(loginLog);
+        
+        showSuccess();
+    })
+    .catch((error) => {
+        console.error("Firebase error:", error);
+        showError("Couldn't save your data. Please try again.");
+        setLoading(false);
+    });
+}
+
+// Generate a consistent ID from email
+function generateUserId(email) {
+    // Simple hash function for demo purposes
+    // In production, use more secure methods
+    let hash = 0;
+    for (let i = 0; i < email.length; i++) {
+        hash = ((hash << 5) - hash) + email.charCodeAt(i);
+        hash |= 0; // Convert to 32bit integer
+    }
+    return 'user_' + Math.abs(hash).toString(16);
+}
+
+// Helper functions
+function isValidEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+function setLoading(isLoading) {
+    buttonText.textContent = isLoading ? 'Processing...' : 'Continue';
+    loadingSpinner.classList.toggle('hidden', !isLoading);
+    userForm.classList.toggle('opacity-70', isLoading);
+}
+
+function showError(message) {
+    errorMessage.textContent = message;
+    errorMessage.classList.remove('hidden');
+    userForm.classList.add('shake');
+    setTimeout(() => userForm.classList.remove('shake'), 500);
+}
+
+function hideError() {
+    errorMessage.classList.add('hidden');
+}
+
+function showSuccess() {
+    // Animate Poko
+    poko.classList.add('jump');
+    
+    // Navigate to the next page
+    setTimeout(() => {
+        window.location.href = '/mainpage.html';
+    }, 600);
+}
+
+// Add these styles to your CSS
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes wave {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-15deg); }
+        75% { transform: rotate(15deg); }
+    }
+    
+    @keyframes jump {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    
+    .animate-wave {
+        animation: wave 2s infinite;
+        transform-origin: bottom center;
+    }
+    
+    .jump {
+        animation: jump 0.5s ease-in-out;
+    }
+    
+    .shake {
+        animation: shake 0.3s ease-in-out;
+    }
+`;
+document.head.appendChild(style);
     </script>
 </body>
 </html>
